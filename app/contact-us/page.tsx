@@ -1,3 +1,11 @@
+"use client";
+
+import { useState } from "react";
+import { db } from "../../firebaseConfig";  // 2 dots kyunki firebaseConfig.js root me hai
+import { collection, addDoc } from "firebase/firestore";
+
+
+
 import { PageHeader } from "@/components/page-header"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"

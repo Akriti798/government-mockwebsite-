@@ -13,6 +13,8 @@ const navItems = [
   { href: "/locate-center", label: "Locate Center" },
   { href: "/about-uidai", label: "About UIDAI" },
   { href: "/contact-us", label: "Contact Us" },
+  { href: "/register", label: "Register" },
+  { href: "/login", label: "Login" },
 ]
 
 export function Navigation() {

@@ -1,24 +1,36 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Menu, X } from "lucide-react"
-
-const navItems = [
-  { href: "/", label: "Home" },
-  { href: "/aadhaar-services", label: "Aadhaar Services" },
-  { href: "/download-aadhaar", label: "Download Aadhaar" },
-  { href: "/update-details", label: "Update Details" },
-  { href: "/locate-center", label: "Locate Center" },
-  { href: "/about-uidai", label: "About UIDAI" },
-  { href: "/contact-us", label: "Contact Us" },
-  { href: "/register", label: "Register" },
-  { href: "/login", label: "Login" },
-]
+import { onAuthStateChanged, signOut } from "firebase/auth"
+import { auth } from "../firebaseConfig"   // 👈 path adjust karo agar alag hai
 
 export function Navigation() {
   const [isOpen, setIsOpen] = useState(false)
+  const [user, setUser] = useState<any>(null)
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser)
+    })
+    return () => unsubscribe()
+  }, [])
+
+  const handleLogout = async () => {
+    await signOut(auth)
+  }
+
+  const navItems = [
+    { href: "/", label: "Home" },
+    { href: "/aadhaar-services", label: "Aadhaar Services" },
+    { href: "/download-aadhaar", label: "Download Aadhaar" },
+    { href: "/update-details", label: "Update Details" },
+    { href: "/locate-center", label: "Locate Center" },
+    { href: "/about-uidai", label: "About UIDAI" },
+    { href: "/contact-us", label: "Contact Us" },
+  ]
 
   return (
     <>
@@ -43,7 +55,7 @@ export function Navigation() {
             </div>
 
             {/* Desktop Navigation */}
-            <nav className="hidden lg:flex items-center space-x-1">
+            <nav className="hidden lg:flex items-center space-x-3">
               {navItems.map((item) => (
                 <Link
                   key={item.href}
@@ -53,6 +65,38 @@ export function Navigation() {
                   {item.label}
                 </Link>
               ))}
+
+              {/* 👇 User Login/Logout UI */}
+              {user ? (
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 rounded-full bg-white text-primary font-bold flex items-center justify-center">
+                    {user.email?.[0].toUpperCase()}
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-white hover:bg-white/10"
+                    onClick={handleLogout}
+                  >
+                    Logout
+                  </Button>
+                </div>
+              ) : (
+                <>
+                  <Link
+                    href="/register"
+                    className="px-3 py-2 text-sm font-medium text-white hover:bg-white/10 rounded-md transition-colors"
+                  >
+                    Register
+                  </Link>
+                  <Link
+                    href="/login"
+                    className="px-3 py-2 text-sm font-medium text-white hover:bg-white/10 rounded-md transition-colors"
+                  >
+                    Login
+                  </Link>
+                </>
+              )}
             </nav>
 
             {/* Mobile Menu Button */}
@@ -80,6 +124,40 @@ export function Navigation() {
                     {item.label}
                   </Link>
                 ))}
+
+                {/* 👇 User Login/Logout for mobile */}
+                {user ? (
+                  <div className="flex items-center space-x-3 px-3 py-2">
+                    <div className="w-8 h-8 rounded-full bg-white text-primary font-bold flex items-center justify-center">
+                      {user.email?.[0].toUpperCase()}
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-white hover:bg-white/10"
+                      onClick={handleLogout}
+                    >
+                      Logout
+                    </Button>
+                  </div>
+                ) : (
+                  <>
+                    <Link
+                      href="/register"
+                      className="px-3 py-2 text-sm font-medium text-white hover:bg-white/10 rounded-md transition-colors"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      Register
+                    </Link>
+                    <Link
+                      href="/login"
+                      className="px-3 py-2 text-sm font-medium text-white hover:bg-white/10 rounded-md transition-colors"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      Login
+                    </Link>
+                  </>
+                )}
               </div>
             </nav>
           )}

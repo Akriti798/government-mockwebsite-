@@ -9,10 +9,12 @@ export default function RegisterPage() {
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [error, setError] = useState("")   // 👈 error ke liye state
   const router = useRouter()
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
+    setError("") // reset error before new attempt
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password)
 
@@ -24,6 +26,17 @@ export default function RegisterPage() {
       router.push("/") // Register hone ke baad homepage par redirect
     } catch (error: any) {
       console.error(error.message)
+
+      // 👇 Friendly error messages
+      if (error.code === "auth/weak-password") {
+        setError("Password must be at least 6 characters long.")
+      } else if (error.code === "auth/email-already-in-use") {
+        setError("This email is already registered.")
+      } else if (error.code === "auth/invalid-email") {
+        setError("Please enter a valid email address.")
+      } else {
+        setError("Something went wrong. Please try again.")
+      }
     }
   }
 
@@ -52,6 +65,10 @@ export default function RegisterPage() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
+
+        {/* 👇 Error message dikhega red me */}
+        {error && <p className="text-red-500 text-sm">{error}</p>}
+
         <button type="submit" className="p-2 bg-blue-600 text-white rounded">
           Register
         </button>
